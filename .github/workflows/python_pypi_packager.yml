@@ -106,18 +106,22 @@ jobs:
         with:
           repository: ${{ env.PKG_GIT_URL }}
           ref: ${{ env.PKG_GIT_COMMIT_SHA }}
+          path: pkg-target
 
       - name: Run ClamAV Malware Scan
         run: |
-          docker run --rm -v "${PWD}:/src" \
-            --user $(id -u):$(id -g) \
+          docker run --rm -v "${PWD}/pkg-target:/src" \
             clamav/clamav:unstable clamscan /src -r -v --log /src/clamscan.txt
+
+      - name: Fix Output File Permissions
+        run: |
+          sudo chown $USER pkg-target/clamscan.txt
 
       - name: Upload ClamAV Malware Scan results
         uses: actions/upload-artifact@v4
         with:
-          name: clamav-malware
-          path: clamscan.txt
+          name: clamav-malware-scan
+          path: pkg-target/clamscan.txt
           if-no-files-found: warn
 
   build_package:
@@ -148,15 +152,21 @@ jobs:
           echo "PKG_GIT_COMMIT_SHA=$PKG_GIT_COMMIT_SHA" >> $GITHUB_ENV
 
       - name: Checkout Package Target
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.PKG_GIT_URL }}
           ref: ${{ env.PKG_GIT_COMMIT_SHA }}
+
+          # We need both our build scripts and the package source
+          path: "pkg-target"
 
       - name: Build Package
         run: |
           source "$ORIGINAL_PWD/ecosystems/${{ github.event.inputs.ecosystem }}/${{ github.event.inputs.package_name }}/build.sh"
           source "$ORIGINAL_PWD/ecosystems/${{ github.event.inputs.ecosystem }}/${{ github.event.inputs.package_name }}/${{ github.event.inputs.package_version }}/build.sh"
+
+          # Change directory to the package source
+          cd "pkg-target"
 
           # This function is defined in the sourced files
           build_package
@@ -172,6 +182,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "package-dist"
-          path: ${{ env.PKG_ARTIFACT_PATH }}
+          path: pkg-target/${{ env.PKG_ARTIFACT_PATH }}
 
 
