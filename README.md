@@ -1,2 +1,2 @@
-# minions
-Safe and Trusted OSS
+# Project Minions
+Safe and Trusted OSS at scale
