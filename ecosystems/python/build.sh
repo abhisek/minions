@@ -23,7 +23,7 @@ function python_cdx_generate_sbom {
 function get_version_for {
   base_version=$1
   timestamp=$(date +"%Y%m%d%H%M%S")
-  patched_version="$base_version-post$timestamp"
+  patched_version="$base_version.post$timestamp"
 
   echo -n $patched_version
 }

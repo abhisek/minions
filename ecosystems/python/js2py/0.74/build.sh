@@ -32,6 +32,7 @@ function build_package {
 }
 
 function get_artifact_path {
+  # setuptools sdist seems to change the version format
   echo -n "dist/js2py-$PATCHED_VERSION.tar.gz"
 }
 
