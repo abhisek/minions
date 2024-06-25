@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Install build tools
+python -m pip install setuptools wheel
+
 # Install CycloneDX for SBOM generation
 python -m pip install cyclonedx-bom
 
