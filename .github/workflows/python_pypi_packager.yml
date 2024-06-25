@@ -77,11 +77,12 @@ jobs:
           path: semgrep.sarif
           if-no-files-found: warn
 
-      - name: Upload Semgrep Results to CodeQL
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep.sarif
-          categories: "pkg-${{ github.event.inputs.ecosystem }}-${{ github.event.inputs.package_name }}-${{ github.event.inputs.package_version }}"
+      # CodeQL upload doesn't seem to work without a commit
+      #- name: Upload Semgrep Results to CodeQL
+      #  uses: github/codeql-action/upload-sarif@v3
+      #  with:
+      #    sarif_file: semgrep.sarif
+      #    categories: "pkg-${{ github.event.inputs.ecosystem }}-${{ github.event.inputs.package_name }}-${{ github.event.inputs.package_version }}"
 
   security_scanning_malware:
     runs-on: ubuntu-latest
@@ -107,7 +108,10 @@ jobs:
           ref: ${{ env.PKG_GIT_COMMIT_SHA }}
 
       - name: Run ClamAV Malware Scan
-        run: docker run --rm -v "${PWD}:/src" clamav/clamav:unstable clamscan /src -r -v --log /src/clamscan.txt
+        run: |
+          docker run --rm -v "${PWD}:/src" \
+            --user $(id -u):$(id -g) \
+            clamav/clamav:unstable clamscan /src -r -v --log /src/clamscan.txt
 
       - name: Upload ClamAV Malware Scan results
         uses: actions/upload-artifact@v4
