@@ -26,7 +26,7 @@ function build_package {
 }
 
 function get_artifact_path {
-  echo -n "dist/Js2Py-0.74.tar.gz"
+  echo -n "dist/js2py-0.74.tar.gz"
 }
 
 function get_sbom_path {
