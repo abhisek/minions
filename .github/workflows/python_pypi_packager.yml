@@ -46,7 +46,6 @@ jobs:
 
   security_scanning_sast:
     runs-on: ubuntu-latest
-    if: false
     name: Security Scanning (SAST)
     needs: verify_request
     steps:
@@ -89,7 +88,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Security Scanning (Malware)
     needs: verify_request
-    if: false
     steps:
       - name: Check out the repository
         uses: actions/checkout@v2
@@ -129,9 +127,9 @@ jobs:
   build_package:
     runs-on: ubuntu-latest
     name: Build Package
-      #needs:
-      #- security_scanning_sast
-      #- security_scanning_malware
+    needs:
+      - security_scanning_sast
+      - security_scanning_malware
     steps:
       - name: Check out the repository
         uses: actions/checkout@v2
