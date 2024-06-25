@@ -2,14 +2,17 @@
 # by manually going through past commits and looking for version number
 # in setup.py
 
+SOURCE=${BASH_SOURCE[0]}
 PKG_GIT_COMMIT_SHA="2e017b86e2f18a6c8a842293b1687f2ce7baa12e"
 
 # The caller of these functions must set the $PWD
-# to directory of the package source code
+# to directory of the package source code.
 
 function build_package {
+  scriptDir=$(dirname $SOURCE)
+
   # Apply patches
-  patch -p1 < ./patches/marven11-CVE-2024-28397-js2py-Sandbox-Escape-patch.txt
+  patch -p1 < $scriptDir/patches/marven11-CVE-2024-28397-js2py-Sandbox-Escape-patch.txt
 
   # Make sure dependencies are available
   pip install -r ./requirements.txt
