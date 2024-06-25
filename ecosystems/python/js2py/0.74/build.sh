@@ -17,6 +17,12 @@ function build_package {
   # Make sure dependencies are available
   pip install -r ./requirements.txt
 
+  # Patch the version
+  version=$(get_version_for "0.74")
+  sed -i "s/0.74/$version/g" setup.py
+
+  export PATCHED_VERSION=$version
+
   # Build package
   python setup.py sdist
 
@@ -26,9 +32,9 @@ function build_package {
 }
 
 function get_artifact_path {
-  echo -n "dist/js2py-0.74.tar.gz"
+  echo -n "dist/js2py-$PATCHED_VERSION.tar.gz"
 }
 
 function get_sbom_path {
-  echo -n "dist/Js2Py-0.74-CycloneDX.sbom"
+  echo -n "dist/Js2Py-$PATCHED_VERSION-CycloneDX.sbom"
 }

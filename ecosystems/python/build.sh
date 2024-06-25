@@ -13,3 +13,15 @@ function python_cdx_generate_sbom {
 
   cyclonedx-py ${type} > ${output}
 }
+
+# We are building an upstream package version
+# But we cannot silently overwrite it. We will publish
+# our patched version to clearly differentiate from upstream
+# published artefacts
+function get_version_for {
+  base_version=$1
+  timestamp=$(date +"%Y%m%d%H%M%S")
+  patched_version="$base_version-sd-$timestamp"
+
+  echo -n $patched_version
+}
