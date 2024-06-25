@@ -139,9 +139,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Save Current Directory
-        run: echo "::set-env name=ORIGINAL_PWD::$(pwd)"
-
       - name: Export Package Target
         shell: bash
         run: |
@@ -156,14 +153,13 @@ jobs:
         with:
           repository: ${{ env.PKG_GIT_URL }}
           ref: ${{ env.PKG_GIT_COMMIT_SHA }}
-
-          # We need both our build scripts and the package source
           path: "pkg-target"
 
       - name: Build Package
         run: |
-          source "$ORIGINAL_PWD/ecosystems/${{ github.event.inputs.ecosystem }}/${{ github.event.inputs.package_name }}/build.sh"
-          source "$ORIGINAL_PWD/ecosystems/${{ github.event.inputs.ecosystem }}/${{ github.event.inputs.package_name }}/${{ github.event.inputs.package_version }}/build.sh"
+          source "ecosystems/${{ github.event.inputs.ecosystem }}/build.sh"
+          source "ecosystems/${{ github.event.inputs.ecosystem }}/${{ github.event.inputs.package_name }}/build.sh"
+          source "ecosystems/${{ github.event.inputs.ecosystem }}/${{ github.event.inputs.package_name }}/${{ github.event.inputs.package_version }}/build.sh"
 
           # Change directory to the package source
           cd "pkg-target"
@@ -173,15 +169,22 @@ jobs:
 
           # This function is defined in the sourced files
           artifact_path=$(get_artifact_path)
+          artifact_sbom_path=$(get_sbom_path)
 
           # Export the artifact path
           echo "PKG_ARTIFACT_PATH=$artifact_path" >> $GITHUB_ENV
-
+          echo "PKG_SBOM_PATH=$artifact_sbom_path" >> $GITHUB_ENV
 
       - name: Upload Package
         uses: actions/upload-artifact@v4
         with:
           name: "package-dist"
           path: pkg-target/${{ env.PKG_ARTIFACT_PATH }}
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: "package-sbom"
+          path: pkg-target/${{ env.PKG_SBOM_PATH }}
 
 

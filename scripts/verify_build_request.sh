@@ -4,8 +4,14 @@ ecosystem=$1
 name=$2
 version=$3
 
+pkg_ecosystem_script = "ecosystems/$ecosystem/build.sh"
 pkg_build_script="ecosystems/$ecosystem/$name/build.sh"
 pkg_version_build_script="ecosystems/$ecosystem/$name/$version/build.sh"
+
+if [ ! -f $pkg_ecosystem_script ]; then
+  echo "Ecosystem build script not found: $pkg_ecosystem_script"
+  exit 1
+fi
 
 if [ ! -f $pkg_build_script ]; then
   echo "Package build script not found: $pkg_build_script"
